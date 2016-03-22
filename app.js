@@ -45,8 +45,16 @@ app.get('/angular', function(req, res){
  * Respond to GET requests to /account.
  * Upon request, render the 'account.html' web page in views/ directory.
  */
-  app.get('/', function(req, res){
+app.get('/vanilla', function(req, res){
     res.render('account.html');
+});
+
+/*
+ * Respond to GET requests to /account.
+ * Upon request, render the 'account.html' web page in views/ directory.
+ */
+  app.get('/', function(req, res){
+    res.render('index.html');
 });
 
 /*
