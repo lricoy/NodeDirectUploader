@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "express": "3.x",
+    "aws-sdk": "*",
+    "dotenv": "2.0.0",
     "ejs": "*",
-    "aws-sdk": "*"
+    "express": "3.x"
   }
 }

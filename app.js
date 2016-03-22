@@ -28,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 /*
  * Load the S3 information from the environment variables.
  */
+require('dotenv').config();
 var AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY;
 var AWS_SECRET_KEY = process.env.AWS_SECRET_KEY;
 var S3_BUCKET = process.env.S3_BUCKET;
@@ -36,7 +37,15 @@ var S3_BUCKET = process.env.S3_BUCKET;
  * Respond to GET requests to /account.
  * Upon request, render the 'account.html' web page in views/ directory.
  */
-app.get('/account', function(req, res){
+app.get('/angular', function(req, res){
+    res.render('angular-upload.html');
+});
+
+/*
+ * Respond to GET requests to /account.
+ * Upon request, render the 'account.html' web page in views/ directory.
+ */
+  app.get('/', function(req, res){
     res.render('account.html');
 });
 
@@ -47,43 +56,49 @@ app.get('/account', function(req, res){
  */
 app.get('/sign_s3', function(req, res){
     aws.config.update({accessKeyId: AWS_ACCESS_KEY , secretAccessKey: AWS_SECRET_KEY });
-    var s3 = new aws.S3(); 
-    var s3_params = { 
-        Bucket: S3_BUCKET, 
-        Key: req.query.file_name, 
-        Expires: 60, 
-        ContentType: req.query.file_type, 
+    aws.config.update({ signatureVersion: 'v4', region: 'sa-east-1' });
+
+    var s3 = new aws.S3();
+    var s3_params = {
+        Bucket: S3_BUCKET,
+        Key: req.query.file_name,
+        Expires: 600,
+        ContentType: req.query.file_type,
         ACL: 'public-read'
-    }; 
-    s3.getSignedUrl('putObject', s3_params, function(err, data){ 
-        if(err){ 
-            console.log(err); 
+    };
+    s3.getSignedUrl('putObject', s3_params, function(err, data){
+        if(err){
+            console.log(err);
         }
-        else{ 
+        else{
             var return_data = {
                 signed_request: data,
-                url: 'https://'+S3_BUCKET+'.s3.amazonaws.com/'+req.query.file_name 
+                url: 'https://'+S3_BUCKET+'.s3.amazonaws.com/'+req.query.file_name
             };
+            console.log(return_data);
             res.write(JSON.stringify(return_data));
             res.end();
-        } 
+        }
     });
 });
 
 /*
  * Respond to POST requests to /submit_form.
- * This function needs to be completed to handle the information in 
+ * This function needs to be completed to handle the information in
  * a way that suits your application.
  */
 app.post('/submit_form', function(req, res){
     username = req.body.username;
     full_name = req.body.full_name;
     avatar_url = req.body.avatar_url;
-    update_account(username, full_name, avatar_url); // TODO: create this function
+    //update_account(username, full_name, avatar_url); // TODO: create this function
     // TODO: Return something useful or redirect
+    res.status(200).send('OK');
 });
 
 /*
  * Start the server to handle incoming requests.
  */
-app.listen(app.get('port'));
+app.listen(app.get('port'), function () {
+ console.log('App running');
+});
